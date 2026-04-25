@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getStoreOrders } from "../../services/order.service";
+import { supabase } from "../../services/supabase";
 
 interface Order {
   id: string;
@@ -9,10 +10,12 @@ interface Order {
   stores: { name: string };
   profiles: { name: string };
   delivery_id: string | null;
+  status: string;
   created_at?: string;
 }
 
 export const StoreOrdersPage = () => {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
 
   useEffect(() => {
@@ -26,17 +29,25 @@ export const StoreOrdersPage = () => {
     };
 
     fetchOrders();
+
+    const channel = supabase
+      .channel("store-orders-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, fetchOrders)
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   return (
     <div className="min-h-screen bg-base-200 p-8">
       <div className="max-w-2xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">📋 Store Orders</h1>
-          <Link to="/store/my-store" className="btn btn-outline">
-            ← Go back
-          </Link>
-        </div>
+        <button
+          className="btn btn-outline mb-4 flex items-center gap-2"
+          onClick={() => navigate("/store/my-store")}
+        >
+          ← Back
+        </button>
+        <h1 className="text-3xl font-bold mb-8">📋 Store Orders</h1>
 
         {orders.length === 0 ? (
           <div className="card bg-base-100 shadow-xl">
@@ -53,9 +64,15 @@ export const StoreOrdersPage = () => {
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="font-bold text-lg">Order</h3>
                     <span
-                      className={`badge ${order.delivery_id ? "badge-success" : "badge-warning"}`}
+                      className={`badge ${
+                        order.status === "Entregado"
+                          ? "badge-success"
+                          : order.status === "En entrega"
+                          ? "badge-info"
+                          : "badge-warning"
+                      }`}
                     >
-                      {order.delivery_id ? "Assigned" : "Pending"}
+                      {order.status}
                     </span>
                   </div>
 

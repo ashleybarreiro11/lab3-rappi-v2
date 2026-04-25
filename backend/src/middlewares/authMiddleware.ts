@@ -49,9 +49,17 @@ export const authMiddleware =
 
       const userRole = user.user_metadata?.role as UserRole | undefined;
 
+      console.log("[AUTH DEBUG]", {
+        endpoint: req.originalUrl,
+        userEmail: user.email,
+        userRole,
+        requiredRoles: roles,
+        userMetadata: user.user_metadata,
+      });
+
       if (roles.length > 0 && (!userRole || !roles.includes(userRole))) {
         throw Boom.forbidden(
-          "You do not have permission to access this resource",
+          `Role mismatch: token has role "${userRole ?? "none"}", required: [${roles.join(", ")}]`,
         );
       }
 

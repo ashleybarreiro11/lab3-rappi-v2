@@ -18,6 +18,18 @@ export const authenticateUserService = async (
   return signInResponse.data;
 };
 
+export const refreshSessionService = async (refreshToken: string) => {
+  const { data, error } = await supabase.auth.refreshSession({
+    refresh_token: refreshToken,
+  });
+
+  if (error) {
+    throw Boom.unauthorized(error.message);
+  }
+
+  return data;
+};
+
 export const createUserService = async (
   user: CreateUserDTO,
 ): Promise<AuthResponse["data"]> => {

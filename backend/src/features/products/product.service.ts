@@ -34,6 +34,10 @@ export class ProductService {
       throw Boom.badRequest("name and price are required");
     }
 
+    if (product.price < 10000) {
+      throw Boom.badRequest("El precio mínimo debe ser mayor o igual a 10.000");
+    }
+
     const { data, error } = await supabase
       .from("products")
       .insert({

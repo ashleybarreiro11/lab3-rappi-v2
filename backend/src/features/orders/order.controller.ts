@@ -20,6 +20,8 @@ export class OrderController {
       user_id: user.id,
       store_id: req.body.store_id,
       items: req.body.items,
+      delivery_latitude: req.body.delivery_latitude,
+      delivery_longitude: req.body.delivery_longitude,
     });
     return res.status(201).json(order);
   };

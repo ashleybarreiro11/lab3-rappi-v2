@@ -8,6 +8,7 @@ import { StoresPage } from "./pages/consumer/StoresPage";
 import { ProductsPage } from "./pages/consumer/ProductsPage";
 import { CartPage } from "./pages/consumer/CartPage";
 import { MyOrdersPage } from "./pages/consumer/MyOrdersPage";
+import { ConsumerTrackingPage } from "./pages/consumer/ConsumerTrackingPage";
 
 // Store
 import { MyStorePage } from "./pages/store/MyStorePage";
@@ -17,6 +18,7 @@ import { StoreOrdersPage } from "./pages/store/StoreOrdersPage";
 // Delivery
 import { AvailableOrdersPage } from "./pages/delivery/AvailableOrdersPage";
 import { MyDeliveriesPage } from "./pages/delivery/MyDeliveriesPage";
+import { DeliveryTrackingPage } from "./pages/delivery/DeliveryTrackingPage";
 
 function App() {
   return (
@@ -37,6 +39,10 @@ function App() {
         />
         <Route path="/consumer/cart" element={<CartPage />} />
         <Route path="/consumer/my-orders" element={<MyOrdersPage />} />
+        <Route
+          path="/consumer/tracking/:orderId"
+          element={<ConsumerTrackingPage />}
+        />
 
         {/* Store */}
         <Route path="/store/my-store" element={<MyStorePage />} />
@@ -49,6 +55,10 @@ function App() {
           element={<AvailableOrdersPage />}
         />
         <Route path="/delivery/my-deliveries" element={<MyDeliveriesPage />} />
+        <Route
+          path="/delivery/tracking/:orderId"
+          element={<DeliveryTrackingPage />}
+        />
       </Routes>
     </BrowserRouter>
   );

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { getProductsByStore } from "../../services/product.service";
 
 interface Product {
@@ -16,8 +16,10 @@ interface CartItem {
 }
 
 export const ProductsPage = () => {
+  const navigate = useNavigate();
   const { storeId } = useParams();
   const [products, setProducts] = useState<Product[]>([]);
+  const [addedProduct, setAddedProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -69,12 +71,18 @@ export const ProductsPage = () => {
 
     localStorage.setItem("cart", JSON.stringify(updatedCart));
     localStorage.setItem("cart_store_id", String(storeId));
-    alert("Product added to cart");
+    setAddedProduct(product);
   };
 
   return (
     <div className="min-h-screen bg-base-200 p-8">
       <div className="max-w-4xl mx-auto">
+        <button
+          className="btn btn-outline mb-4 flex items-center gap-2"
+          onClick={() => navigate(-1)}
+        >
+          ← Back
+        </button>
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">🛍️ Products</h1>
           <Link to="/consumer/cart" className="btn btn-outline btn-primary">
@@ -114,6 +122,41 @@ export const ProductsPage = () => {
           </div>
         )}
       </div>
+
+      {addedProduct && (
+        <div className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg mb-4">Product added to cart!</h3>
+            <div className="flex items-center gap-4 bg-base-200 rounded-xl p-4 mb-6">
+              <span className="text-4xl">🛒</span>
+              <div>
+                <p className="font-semibold text-base">{addedProduct.name}</p>
+                <p className="text-primary font-bold">
+                  ${addedProduct.price.toFixed(2)}
+                </p>
+              </div>
+            </div>
+            <div className="modal-action flex gap-3">
+              <button
+                className="btn btn-outline flex-1"
+                onClick={() => setAddedProduct(null)}
+              >
+                Continue shopping
+              </button>
+              <Link
+                to="/consumer/cart"
+                className="btn btn-primary flex-1"
+              >
+                Go to cart
+              </Link>
+            </div>
+          </div>
+          <div
+            className="modal-backdrop"
+            onClick={() => setAddedProduct(null)}
+          />
+        </div>
+      )}
     </div>
   );
 };

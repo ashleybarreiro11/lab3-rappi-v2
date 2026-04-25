@@ -12,6 +12,8 @@ interface Store {
 export const StoresPage = () => {
   const navigate = useNavigate();
   const [stores, setStores] = useState<Store[]>([]);
+  const name = localStorage.getItem("name");
+  const role = localStorage.getItem("role");
 
   useEffect(() => {
     const fetchStores = async () => {
@@ -34,6 +36,12 @@ export const StoresPage = () => {
   return (
     <div className="min-h-screen bg-base-200 p-8">
       <div className="max-w-4xl mx-auto">
+        {(name || role) && (
+          <div className="mb-6">
+            {name && <h2 className="text-2xl font-bold">Hola, {name}</h2>}
+            {role && <p className="text-base-content/60 capitalize">{role}</p>}
+          </div>
+        )}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">🏪 Stores</h1>
           <div className="flex gap-3">
@@ -65,7 +73,7 @@ export const StoresPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {stores.map((store) => (
               <div key={store.id} className="card bg-base-100 shadow-xl">
-                <div className="card-body">
+                <div className="card-body flex flex-col">
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="card-title">{store.name}</h3>
                     <span
@@ -74,7 +82,7 @@ export const StoresPage = () => {
                       {store.is_open ? "Open" : "Closed"}
                     </span>
                   </div>
-                  <div className="card-actions mt-4">
+                  <div className="card-actions mt-auto pt-4">
                     <Link
                       to={`/consumer/stores/${store.id}/products`}
                       className={`btn btn-primary w-full ${!store.is_open ? "btn-disabled" : ""}`}

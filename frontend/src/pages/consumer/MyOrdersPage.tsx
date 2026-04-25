@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { getMyOrders } from "../../services/order.service";
+import { supabase } from "../../services/supabase";
 
 interface Order {
   id: string;
@@ -7,10 +9,12 @@ interface Order {
   store_id: string;
   stores: { name: string };
   delivery_id: string | null;
+  status: string;
   created_at?: string;
 }
 
 export const MyOrdersPage = () => {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
 
   useEffect(() => {
@@ -24,11 +28,24 @@ export const MyOrdersPage = () => {
     };
 
     fetchOrders();
+
+    const channel = supabase
+      .channel("my-orders-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, fetchOrders)
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   return (
     <div className="min-h-screen bg-base-200 p-8">
       <div className="max-w-2xl mx-auto">
+        <button
+          className="btn btn-outline mb-4 flex items-center gap-2"
+          onClick={() => navigate("/consumer/stores")}
+        >
+          ← Back
+        </button>
         <h1 className="text-3xl font-bold mb-8">📦 My Orders</h1>
 
         {orders.length === 0 ? (
@@ -46,9 +63,19 @@ export const MyOrdersPage = () => {
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="font-bold text-lg">Order</h3>
                     <span
-                      className={`badge ${order.delivery_id ? "badge-success" : "badge-warning"}`}
+                      className={`badge ${
+                        order.status === "Entregado"
+                          ? "badge-success"
+                          : order.status === "En entrega"
+                          ? "badge-info"
+                          : "badge-warning"
+                      }`}
                     >
-                      {order.delivery_id ? "Assigned" : "Pending"}
+                      {order.status === "Entregado"
+                        ? "Recibido"
+                        : order.status === "En entrega"
+                        ? "Assigned"
+                        : "Pending"}
                     </span>
                   </div>
 
@@ -78,6 +105,17 @@ export const MyOrdersPage = () => {
                         : "No date"}
                     </p>
                   </div>
+
+                  {order.delivery_id && (
+                    <div className="mt-4 flex justify-end">
+                      <Link
+                        to={`/consumer/tracking/${order.id}`}
+                        className="btn btn-primary btn-sm"
+                      >
+                        📍 Track Order
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

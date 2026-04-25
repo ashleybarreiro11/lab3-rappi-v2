@@ -6,6 +6,7 @@ import {
   rejectOrder,
 } from "../../services/order.service";
 import { logout } from "../../services/auth.service";
+import { supabase } from "../../services/supabase";
 
 interface Order {
   id: string;
@@ -19,6 +20,8 @@ interface Order {
 export const AvailableOrdersPage = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
+  const name = localStorage.getItem("name");
+  const role = localStorage.getItem("role");
   const [loadingAction, setLoadingAction] = useState<{
     id: string | null;
     type: "accept" | "reject" | null;
@@ -38,6 +41,13 @@ export const AvailableOrdersPage = () => {
 
   useEffect(() => {
     fetchOrders();
+
+    const channel = supabase
+      .channel("available-orders-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, fetchOrders)
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   const handleAcceptOrder = async (orderId: string) => {
@@ -45,8 +55,7 @@ export const AvailableOrdersPage = () => {
       const cleanId = String(orderId).trim();
       setLoadingAction({ id: cleanId, type: "accept" });
       await acceptOrder(cleanId);
-      alert("Order accepted successfully");
-      fetchOrders();
+      navigate(`/delivery/tracking/${cleanId}`);
     } catch (error: any) {
       console.error(error);
       alert(error?.response?.data?.message || "Could not accept order");
@@ -78,6 +87,12 @@ export const AvailableOrdersPage = () => {
   return (
     <div className="min-h-screen bg-base-200 p-8">
       <div className="max-w-2xl mx-auto">
+        {(name || role) && (
+          <div className="mb-6">
+            {name && <h2 className="text-2xl font-bold">Hola, {name}</h2>}
+            {role && <p className="text-base-content/60 capitalize">{role}</p>}
+          </div>
+        )}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Available Orders</h1>
           <div className="flex gap-3">

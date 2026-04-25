@@ -21,6 +21,8 @@ export const MyStorePage = () => {
   const navigate = useNavigate();
   const [store, setStore] = useState<Store | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
+  const name = localStorage.getItem("name");
+  const role = localStorage.getItem("role");
 
   useEffect(() => {
     const fetchStore = async () => {
@@ -64,6 +66,12 @@ export const MyStorePage = () => {
   return (
     <div className="min-h-screen bg-base-200 p-8">
       <div className="max-w-2xl mx-auto">
+        {(name || role) && (
+          <div className="mb-6">
+            {name && <h2 className="text-2xl font-bold">Hola, {name}</h2>}
+            {role && <p className="text-base-content/60 capitalize">{role}</p>}
+          </div>
+        )}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">🏪 My Store</h1>
           <button className="btn btn-error btn-outline" onClick={handleLogout}>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { createProduct } from "../../services/product.service";
 
 export const CreateProductPage = () => {
@@ -25,6 +25,12 @@ export const CreateProductPage = () => {
     <div className="min-h-screen bg-base-200 flex items-center justify-center">
       <div className="card bg-base-100 shadow-xl w-full max-w-sm">
         <div className="card-body">
+          <button
+            className="btn btn-outline btn-sm mb-4 flex items-center gap-2 self-start"
+            onClick={() => navigate("/store/my-store")}
+          >
+            ← Back
+          </button>
           <h1 className="text-2xl font-bold text-center mb-2">
             ➕ Create Product
           </h1>
@@ -64,11 +70,7 @@ export const CreateProductPage = () => {
             </button>
           </form>
 
-          <p className="text-center text-sm mt-4 text-base-content/60">
-            <Link to="/store/my-store" className="link link-primary">
-              ← Go back
-            </Link>
-          </p>
+
         </div>
       </div>
     </div>

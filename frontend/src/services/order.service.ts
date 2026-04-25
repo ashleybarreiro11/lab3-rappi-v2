@@ -8,10 +8,17 @@ interface OrderItemDTO {
 interface CreateOrderDTO {
   store_id: string;
   items: OrderItemDTO[];
+  delivery_latitude: number;
+  delivery_longitude: number;
 }
 
 export const createOrder = async (payload: CreateOrderDTO) => {
   const response = await api.post("/orders", payload);
+  return response.data;
+};
+
+export const getOrderDetails = async (orderId: string) => {
+  const response = await api.get(`/orders/${orderId}`);
   return response.data;
 };
 
@@ -44,3 +51,32 @@ export const rejectOrder = async (orderId: string) => {
   const response = await api.patch(`/orders/${orderId}/reject`);
   return response.data;
 };
+
+
+export const updateDeliveryLocation = async (
+  orderId: string,
+  latitude: number,
+  longitude: number,
+) => {
+  const response = await api.put(`/orders/${orderId}/location`, {
+    latitude,
+    longitude,
+  });
+  return response.data;
+};
+
+export const getDeliveryLocation = async (orderId: string) => {
+  const response = await api.get(`/orders/${orderId}/location`);
+  return response.data;
+};
+
+export const markOrderDelivered = async (orderId: string) => {
+  const response = await api.patch(`/orders/${orderId}/deliver`);
+  return response.data;
+};
+
+export const getStoreLocation = async (orderId: string) => {
+  const response = await api.get(`/orders/${orderId}/store-location`);
+  return response.data;
+};
+
