@@ -1,8 +1,8 @@
 import axios from "axios";
 
 export const api = axios.create({
-  //baseURL: "https://lab3-rappi-v2.vercel.app/api",
-  baseURL: "http://localhost:3000/api",
+  baseURL: "https://lab3-rappi-v2.vercel.app/api",
+  // baseURL: "http://localhost:3000/api",
 });
 
 api.interceptors.request.use((config) => {
